@@ -10,6 +10,12 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    (function () {
+      emailjs.init("7eonsY9mIhSJPLw08");
+    })();
+  </script>
   <style>
     /* ============================================================
        CSS VARIABLES & RESET
@@ -2054,17 +2060,34 @@
 
       if (!valid) return;
 
-      // Simulate submission
+      // Real EmailJS Submission
       const btn = document.getElementById('form-submit-btn');
       btn.disabled = true;
       btn.textContent = 'ENCRYPTING & SENDING...';
 
-      setTimeout(() => {
-        document.getElementById('contact-form').style.display = 'none';
-        const success = document.getElementById('form-success');
-        success.classList.add('show');
-        document.getElementById('ref-code').textContent = 'RW-' + Math.random().toString(36).substr(2, 8).toUpperCase();
-      }, 1800);
+      const templateParams = {
+        from_name: name,
+        email: email,
+        company: company,
+        phone: document.getElementById('fphone').value.trim(),
+        service: service,
+        message: msg,
+      };
+
+      emailjs.send("service_fahm9ac", "template_hy5v2cs", templateParams)
+        .then(function () {
+          document.getElementById('contact-form').style.display = 'none';
+          const success = document.getElementById('form-success');
+          success.classList.add('show');
+          document.getElementById('ref-code').textContent =
+            'RW-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+        })
+        .catch(function (error) {
+          alert("Message failed to send. Please try again.");
+          btn.disabled = false;
+          btn.textContent = '⟶  SEND ENCRYPTED MESSAGE';
+          console.error("EmailJS Error:", error);
+        });
     });
 
     /* Clear validation on input */
